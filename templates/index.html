@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GraphQL Profile</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Background -->
+    <div id="background-container"></div>
+
+    <!-- Master UI wrapper -->
+    <div id="uiWrapper">
+        <!-- Sign -->
+        <img id="zoneSign" src="/static/img/zone01_sign.png" alt="Zone Sign">
+
+        <!-- Login form -->
+        <div id="loginFormContainer">
+            <form id="loginForm">
+                <input type="text" id="username" class="custom-input" placeholder="Username or Email" required>
+                <input type="password" id="password" class="custom-input" placeholder="Password" required>
+                <button type="submit" class="custom-button"></button>
+            </form>
+            <p id="errorMsg" style="color: red;"></p>
+        </div>
+    </div>
+
+    <!-- Profile Section (initially hidden) -->
+    <div id="profileContainer" style="display:none; opacity:0; transition: opacity 0.6s;">
+        <h1>Your Profile</h1>
+        <p id="userLogin">Loading...</p>
+        <p id="userFirstName"></p>
+        <p id="userLastName"></p>
+        <p id="userEmail"></p>
+        <p id="userLevel"></p>
+        <p id="userAudit"></p>
+
+        <button id="logoutBtn">Logout</button>
+
+        <h2>Audit Graph</h2>
+        <div id="auditGraphContainer"></div>
+
+        <h2>XP Graph</h2>
+        <div id="xpGraphContainer"></div>
+    </div>
+
+    <script src="/scripts/main.js"></script>
+</body>
+</html>

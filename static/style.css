@@ -1,0 +1,108 @@
+/* Base body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Fullscreen background */
+#background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('/static/img/graphQL_background.png') no-repeat;
+    background-size: cover; /* fills screen without distortion */
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Master wrapper fixed & centered, keeps size */
+#uiWrapper {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px; /* space between sign and login */
+}
+
+/* Sign image */
+#zoneSign {
+    width: 411px;
+    height: 216px;
+    display: block;
+}
+
+/* Login form container */
+#loginFormContainer {
+    text-align: center;
+}
+
+/* Input boxes */
+input.custom-input {
+    display: block;
+    margin: 15px auto;
+    width: 320px;
+    height: 45px;
+    font-size: 14px;
+    line-height: 45px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    border: none;
+    outline: none;
+
+    background: url('/static/img/graphQL_textinput.png') no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    color: #333;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+/* Custom login button */
+button.custom-button {
+    width: 260px;
+    height: 80px;
+    background: url('/static/img/graphQL_login.png') no-repeat center center;
+    background-size: cover;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    display: block;
+    margin: 20px auto;
+    padding: 0;
+}
+
+button.custom-button:hover {
+    filter: brightness(1.1);
+    transform: scale(1.1);
+}
+
+button.custom-button:active {
+    filter: brightness(0.9);
+    transform: scale(1.05);
+}
+
+/* Prevent autofill from changing background */
+input.custom-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    -webkit-text-fill-color: #333 !important;
+    background: url('/static/img/graphQL_textinput.png') no-repeat !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+input.custom-input:-moz-autofill {
+    box-shadow: 0 0 0px 1000px transparent inset !important;
+    -moz-text-fill-color: #333 !important;
+    background: url('/static/img/graphQL_textinput.png') no-repeat !important;
+    background-size: cover !important;
+    background-position: center !important;
+}

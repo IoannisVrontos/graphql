@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Profile</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Your Profile</h1>
+    <p id="userLogin">Loading...</p>
+    <p id="userFirstName"></p>
+    <p id="userLastName"></p>
+    <p id="userEmail"></p>
+    <p id="userLevel"></p>
+    <p id="userAudit"></p>
+
+<button id="logoutBtn">Logout</button>
+
+<!-- New graph container -->
+<h2>Audit Graph</h2>
+<div id="auditGraphContainer"></div>
+
+<h2>XP Graph</h2>
+<div id="xpGraphContainer"></div>
+
+    <script src="/scripts/profile.js"></script>
+    <script src="/scripts/introspection.js"></script>
+</body>
+</html>
