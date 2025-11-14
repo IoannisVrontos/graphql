@@ -82,6 +82,17 @@ userEmail.textContent= `Email: ${user.email}`;
 userAudit.textContent= `Audit Ratio: ${Math.round(user.auditRatio * 10) / 10}`;
 userLevel.textContent = `Current User Level: ${filteredTransactions.length+1}`;
 
+const CurrentExp = GetExp();
+const sortedAudits = await loadAndCompare ();
+const {totalUp,totalDown} = AuditNumbers(sortedAudits);
+
+console.log(totalUp,totalDown)
+
+userUp.textContent = `Up Ratio: ${totalUp}`;
+userDown.textContent = `Down Ratio: ${totalDown}`;
+
+userExp.textContent = `Total Experience: ${CurrentExp}`;
+
 localStorage.setItem("loggedInUsername", user.login);
 
     } catch (err) {
@@ -614,7 +625,19 @@ async function AuditRatioGraph() {
         
         const transactionsAuditRatio = userAuditRatio.transactions || [];
  
+        let sumUp = 0 ;
+        let sumDown = 0 ;
 
+        transactionsAuditRatio.forEach(tx => {
+            if (tx.type == "up") {
+                sumUp += sumUp + tx.amount
+            } else if (tx.type == "down") {
+                sumDown += sumDown + tx.amount
+            }
+        });
+
+        console.log("up",sumUp)
+        console.log("down",sumDown)
         //populating
         transactionsAuditRatio.forEach(tx => {
             auditRatioData.push({
@@ -792,11 +815,13 @@ async function loadAndCompare() {
     DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained,LowestAuditAttained, paddedOldestDate);
 
     CheckingAuditFinal(sortedAudits);
-    AuditRatioPsofa(auditRatioData);
+    // AuditRatioPsofa(auditRatioData);
+
+    return sortedAudits
 }
 
 // call the async wrapper
-loadAndCompare();
+// loadAndCompare();
 
 
 
@@ -1059,7 +1084,7 @@ async function CheckingAuditFinal(sortedAudits) {
         });
 
         console.log("Up total:", totalUp.toFixed(2)); // formatted to 2 decimals
-        console.log("Down total:", totalDown.toFixed(2)); // formatted to 2 decimals
+        console.log("Down total :", totalDown.toFixed(2)); // formatted to 2 decimals
         // console.log("All transactions:", transactions);
 
         // console.log(data)
@@ -1070,7 +1095,7 @@ async function CheckingAuditFinal(sortedAudits) {
 }
 
 
-async function AuditRatioPsofa(sortedAudits) {
+async function AuditNumbers(sortedAudits) {
    
         // Calculate total based on type
         let totalUp = 0;
@@ -1080,14 +1105,15 @@ async function AuditRatioPsofa(sortedAudits) {
             else if (tx.type === "down") totalDown += tx.amount;
         });
 
-        console.log("Up total:", totalUp.toFixed(2)); // formatted to 2 decimals
-        console.log("Down total:", totalDown.toFixed(2)); // formatted to 2 decimals
+        console.log("Up total roufa:", totalUp.toFixed(2)); // formatted to 2 decimals
+        console.log("Down total roufa:", totalDown.toFixed(2)); // formatted to 2 decimals
         // console.log("All transactions:", transactions);
 
         // console.log(data)
         // console.log("checking audit",user)
 
         
+        return {totalUp, totalDown}
 
 }
 
@@ -1170,14 +1196,16 @@ async function GetExp() {
         const totalXP = xpData.reduce((sum, tx) => sum + tx.amount, 0);
         DrawXPGraphWithTooltip(xpData, totalXP);
 
-        return xpData; // ⬅️ return for reuse in graph drawing
+        userExp.textContent = `Total Experience: ${totalXP}`;
+
+        return totalXP; // ⬅️ return for reuse in graph drawing
 
     } catch (err) {
         console.error(err);
     }
 }
 
-GetExp();
+// const CurrentExp = GetExp();
 
 // const xpData = await GetExp(); // from your earlier function
 
