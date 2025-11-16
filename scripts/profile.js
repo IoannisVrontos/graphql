@@ -84,7 +84,7 @@ userLevel.textContent = `Current User Level: ${filteredTransactions.length+1}`;
 
 const CurrentExp = GetExp();
 const sortedAudits = await loadAndCompare ();
-const {totalUp,totalDown} = AuditNumbers(sortedAudits);
+const {totalUp,totalDown} =await AuditNumbers(sortedAudits);
 
 console.log(totalUp,totalDown)
 
@@ -106,479 +106,11 @@ localStorage.setItem("loggedInUsername", user.login);
     });
 });
 
-
-
-async function fetchCurrentUserDynamic() {
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-        console.error("No token found — please log in first.");
-        return;
-    }
-
-    // Step 1: Introspect the 'user' type
-    const introspectionQuery = `
-    {
-        __type(name: "user") {
-            fields {
-                name
-                type {
-                    kind
-                    ofType {
-                        kind
-                    }
-                }
-            }
-        }
-    }`;
-
-    let scalarFields = [];
-
-    try {
-        const introspectResp = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ query: introspectionQuery })
-        }); // ✅ fetch fully closed here
-
-        const introspectData = await introspectResp.json();
-
-        if (introspectData.errors) {
-            console.error("GraphQL Introspection Errors:", introspectData.errors);
-            return;
-        }
-
-        // Filter only scalar fields
-        scalarFields = introspectData.data.__type.fields
-            .filter(f => {
-                const kind = f.type.kind === "NON_NULL" ? f.type.ofType.kind : f.type.kind;
-                return kind !== "OBJECT" && kind !== "LIST" && kind !== "INTERFACE";
-            })
-            .map(f => f.name);
-
-        if (scalarFields.length === 0) {
-            console.error("No scalar fields found for 'user'");
-            return;
-        }
-
-    } catch (err) {
-        console.error("Introspection fetch error:", err);
-        return;
-    }
-
-    // Step 2: Build query with all scalar fields
-    const fieldsString = scalarFields.join("\n        ");
-    const userQuery = `
-    {
-        user {
-            ${fieldsString}
-        }
-    }`;
-
-    // Step 3: Fetch current user data
-    try {
-        const userResp = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ query: userQuery })
-        }); // ✅ fetch fully closed here
-
-        const userData = await userResp.json();
-
-        if (userData.errors) {
-            console.error("GraphQL Errors:", userData.errors);
-            return;
-        }
-
-        // console.log("Current user data:", userData.data.user);
-
-    } catch (err) {
-        console.error("Fetch user error:", err);
-    }
-}
-
-// Call the function
-// fetchCurrentUserDynamic();
-
-
-async function fetchCurrentUserEverything() {
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-        console.error("No token found — please log in first.");
-        return;
-    }
-
-    // Step 1: Introspect scalar fields of 'user'
-    const introspectionQuery = `
-    {
-        __type(name: "user") {
-            fields {
-                name
-                type {
-                    kind
-                    ofType {
-                        kind
-                    }
-                }
-            }
-        }
-    }`;
-
-    let scalarFields = [];
-
-    try {
-        const introspectResp = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ query: introspectionQuery })
-        }); // ✅ fetch properly closed
-
-        const introspectData = await introspectResp.json();
-
-        if (introspectData.errors) {
-            console.error("GraphQL Introspection Errors:", introspectData.errors);
-            return;
-        }
-
-        // Keep only scalar fields
-        scalarFields = introspectData.data.__type.fields
-            .filter(f => {
-                const kind = f.type.kind === "NON_NULL" ? f.type.ofType.kind : f.type.kind;
-                return kind !== "OBJECT" && kind !== "LIST" && kind !== "INTERFACE";
-            })
-            .map(f => f.name);
-
-        if (scalarFields.length === 0) {
-            console.error("No scalar fields found for 'user'");
-            return;
-        }
-
-    } catch (err) {
-        console.error("Introspection fetch error:", err);
-        return;
-    }
-
-    // Step 2: Build full query with relationships
-    const fieldsString = scalarFields.join("\n        ");
-    const fullQuery = `
-    {
-        user {
-            ${fieldsString}
-            transactions {
-                id
-                type
-                amount
-                objectId
-                userId
-                createdAt
-                path
-                object {
-                    results {
-                    userLogin
-                        audits {
-                            auditorLogin
-                        }
-                    }
-                    type
-                    name
-                    id
-                }
-            }
-            progresses {
-                id
-                userId
-                objectId
-                grade
-                createdAt
-                updatedAt
-                path
-                object {
-                    id
-                    name
-                    type
-                    attrs
-                }
-            }
-            results {
-                id
-                objectId
-                userId
-                grade
-                type
-                createdAt
-                updatedAt
-                path
-            }
-            objects {
-                id
-                name
-                type
-                attrs
-            }
-        }
-    }`;
-
-    // Step 3: Fetch full user data
-    try {
-        const userResp = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ query: fullQuery })
-        }); // ✅ fetch properly closed
-
-        const userData = await userResp.json();
-
-        if (userData.errors) {
-            console.error("GraphQL Errors:", userData.errors);
-            return;
-        }
-
-        console.log("Full user data:", userData.data.user);
-
-    } catch (err) {
-        console.error("Fetch user error:", err);
-    }
-}
-
-// Call the function
-fetchCurrentUserEverything();
-
-
-// const userId = 3164; // get this from your current user
-
-async function fetchProjectProgressesOnly() {
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-        console.error("No token found — please log in first.");
-        return;
-    }
-
-    // Valid GraphQL query
-    const query = `
-   query($userId: Int!) {
-        user(where: { id: { _eq: $userId } }) {
-            progresses(
-            where: { grade: { _is_null: false } }
-            order_by: { createdAt: asc }
-            ) {
-                id
-                grade
-                path
-                createdAt
-                updatedAt
-                object {
-                    id
-                    name
-                    type
-                    attrs
-                     groups(where: { members: { userId: { _eq: $userId } } }) {
-                        members {
-                            userLogin
-                        }
-                    }
-                }
-            }
-        }
-    }`; // template literal closed
-
-    try {
-        const response = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // ✅ correct template literal
-            },
-           body: JSON.stringify({
-                query,
-                variables: { userId }, // ✅ pass variable value here
-            }),
-        }); // fetch fully closed
-
-        const data = await response.json();
-
-        if (data.errors) {
-            console.error("GraphQL Errors:", data.errors);
-            return;
-        }
-
-
-    // const user = data.data.user;
-
-    // if (!user || !user.progresses) {
-    // console.error("User or progresses not found", data);
-    // return;
-    // }
-const user = data.data.user;
-
-// If user is an array, take the first element
-const currentUser = Array.isArray(user) ? user[0] : user;
-
-if (!currentUser || !currentUser.progresses) {
-    console.error("No progresses found for the current user", data);
-} else {
-    // Safe: optional chaining
-    // currentUser.progresses.forEach((p, i) => {
-    //     console.log(`Progress #${i}: id=${p.id}, objectType=${p.object?.type}`);
-    // });
-
-    const projectProgresses = currentUser.progresses.filter(
-        p => p.object?.type?.toLowerCase() === "project"
-    );
-
-    // console.log("Project progresses:", projectProgresses);
-        return projectProgresses;
-}
-
-    
-
-    } catch (err) {
-        console.error("Fetch error:", err);
-    }
-}
-
-fetchProjectProgressesOnly();
-
-// take object id from progresses.object and use that for transactions for "xp" to make first graph
-
-// for audit ratio we use "up" and "down" first to test
-
-
-
-
-
-
-
-
-///testing
-
-// async function TestingShit() {
-//  const token = localStorage.getItem("jwt");
-// const query = `
-// {
-//   transactions(
-//     where: {
-//       objectId: { _eq: 101570 }
-//       type: { _eq: "up" }
-//     }
-//   ) {
-//     id
-//     type
-//     amount
-//     path
-//     createdAt
-//     userId
-//   }
-// }
-// `;
-
-// const response = await fetch("/graphql", {
-//     method: "POST",
-//     headers: {
-//         "Content-Type": "application/json",
-//         "Authorization": `Bearer ${token}`,
-//     },
-//     body: JSON.stringify({ query }),
-// });
-
-// const data = await response.json();
-// console.log(data.transactions);
-// console.log(data)
-// }
-
-// TestingShit()
-
-
-async function CheckingAudit() {
-    const token = localStorage.getItem("jwt");
-    const userInfo = document.getElementById("userInfo");
-
-    if (!token) {
-        window.location.href = "/";
-        return;
-    }
-
-    try {
-const query = `
-        {
-            user{
-                    transactions(where: { type: { _in: [up, down] } }) {
-                         type
-                         amount
-                         createdAt
-                         object {
-                             type
-                            name
-                         }   
-                    }
-            }
-        }`; // ✅ properly closed
-
-
-        const response = await fetch("/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({ query }),
-        });
-
-        const data = await response.json();
-
-        if (data.errors) {
-            userLogin.textContent = "Error loading profile data.";
-            console.error(data.errors);
-            return;
-        }
-
-        const user = data.data.user[0];
-        
-        const transactions = user.transactions || [];
-
-        // Calculate total based on type
-        let totalUp = 0;
-        let totalDown = 0;
-        transactions.forEach(tx => {
-            if (tx.type === "up") totalUp += tx.amount;
-            else if (tx.type === "down") totalDown += tx.amount;
-        });
-
-        console.log("Up total:", totalUp.toFixed(2)); // formatted to 2 decimals
-        console.log("Down total:", totalDown.toFixed(2)); // formatted to 2 decimals
-        console.log("All transactions:", transactions);
-
-        // console.log(data)
-        // console.log("checking audit",user)
-
-        
-    } catch (err) {
-        console.log("we f'd up")
-        console.error(err);
-    }
-}
-
-CheckingAudit();
-
-
 // ensure a clean shape (call once at module start)
 const auditRatioData = []; // array of transaction objects
 
 async function AuditRatioGraph() {
     
-    // ensureArrays(auditRatioData);
-
     // fetch token from local storage to make sure user is logged in
     const token = localStorage.getItem("jwt");
 
@@ -624,20 +156,7 @@ async function AuditRatioGraph() {
         const userAuditRatio = dataAuditRatio.data.user[0];
         
         const transactionsAuditRatio = userAuditRatio.transactions || [];
- 
-        let sumUp = 0 ;
-        let sumDown = 0 ;
 
-        transactionsAuditRatio.forEach(tx => {
-            if (tx.type == "up") {
-                sumUp += sumUp + tx.amount
-            } else if (tx.type == "down") {
-                sumDown += sumDown + tx.amount
-            }
-        });
-
-        console.log("up",sumUp)
-        console.log("down",sumDown)
         //populating
         transactionsAuditRatio.forEach(tx => {
             auditRatioData.push({
@@ -648,7 +167,7 @@ async function AuditRatioGraph() {
             });
         });
 
-        console.log("✅ auditRatioData populated:", auditRatioData);
+        // console.log("✅ auditRatioData populated:", auditRatioData);
 
 
          } catch (err) {
@@ -657,13 +176,11 @@ async function AuditRatioGraph() {
     }
 }
 
-// AuditRatioGraph();
 
 const userAudits = []; // array of transaction objects
 
 async function AuditsGraph() {
     
-    // ensureArrays(auditRatioData);
 
     // fetch token from local storage to make sure user is logged in
     const token = localStorage.getItem("jwt");
@@ -711,7 +228,6 @@ async function AuditsGraph() {
             return;
         }
 
-    //    const userAudits = dataAudits.data.user[0];
         
        const audits = dataAudits.data.audit || [];
  
@@ -734,31 +250,12 @@ async function AuditsGraph() {
             });
         });
 
-        // console.log("✅ userAudits populated:", userAudits);
-
 
          } catch (err) {
         console.log("we f'd up")
         console.error(err);
     }
 }
-
-// AuditsGraph();
-
-
-
-// let userAuditsDone = false;
-// let auditRatioDataDone = false;
-
-// // Example usage:
-// if (userAuditsDone && auditRatioDataDone) {
-// const result = FindMatches(userAudits, auditRatioData);
-
-// console.log("Audits without a matching XP entry:", result.auditsWithoutMatch);
-// console.log("XP entries without a matching audit:", result.ratioWithoutMatch);
-// }
-
-
 
 
 function FindMatches(userAudits, auditRatioData) {
@@ -772,8 +269,6 @@ function FindMatches(userAudits, auditRatioData) {
 
     // find items in auditRatioData that are NOT in userAudits
     const ratioWithoutMatch = auditRatioData.filter(a => !auditDates.has(normalizeDate(a.date)));
-    // console.log(auditDates)
-    // console.log(ratioDates)
     return {
         auditsWithoutMatch,
         ratioWithoutMatch
@@ -787,42 +282,21 @@ async function loadAndCompare() {
     await AuditRatioGraph();
     await AuditsGraph();
 
-    
-
     // now both arrays are populated
     const result = FindMatches(userAudits, auditRatioData);
-    console.log("Audits without a matching XP entry:", result.auditsWithoutMatch);
-    console.log("XP entries without a matching audit:", result.ratioWithoutMatch);
     
-
-
-
-
-
     const sortedAudits = MergeMatches(userAudits, auditRatioData);
-    console.log("lego", sortedAudits)
     const { maxAudit: HighestAuditAttained, minAudit: LowestAuditAttained } = FindMaxAudit(sortedAudits);
-    console.log(HighestAuditAttained,LowestAuditAttained)
-    console.log("best audit",HighestAuditAttained)
     const OldestDate = sortedAudits[0].date
-
     // Convert OldestDate to a Date object
     let paddedOldestDate = new Date(OldestDate);
     // Subtract one month
     paddedOldestDate.setMonth(paddedOldestDate.getMonth() - 1);
-    // console.log("date check",OldestDate)
 
     DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained,LowestAuditAttained, paddedOldestDate);
 
-    CheckingAuditFinal(sortedAudits);
-    // AuditRatioPsofa(auditRatioData);
-
     return sortedAudits
 }
-
-// call the async wrapper
-// loadAndCompare();
-
 
 
 function normalizeDate(dateString) {
@@ -1073,37 +547,19 @@ container.appendChild(svg);
     console.log("SVG graph with tooltips drawn.");
 }
 
-async function CheckingAuditFinal(sortedAudits) {
+
+function AuditNumbers(sortedAudits) {
    
+    console.log("sortedAudits received:", sortedAudits);
         // Calculate total based on type
         let totalUp = 0;
         let totalDown = 0;
-        sortedAudits.forEach(tx => {
-            if (tx.ratioType === "up") totalUp += tx.ratioAmount;
-            else if (tx.ratioType === "down") totalDown += tx.ratioAmount;
-        });
+         sortedAudits.forEach(tx => {
+        const t = tx.ratioType;   // <-- use ratioType
 
-        console.log("Up total:", totalUp.toFixed(2)); // formatted to 2 decimals
-        console.log("Down total :", totalDown.toFixed(2)); // formatted to 2 decimals
-        // console.log("All transactions:", transactions);
-
-        // console.log(data)
-        // console.log("checking audit",user)
-
-        
-
-}
-
-
-async function AuditNumbers(sortedAudits) {
-   
-        // Calculate total based on type
-        let totalUp = 0;
-        let totalDown = 0;
-        sortedAudits.forEach(tx => {
-            if (tx.type === "up") totalUp += tx.amount;
-            else if (tx.type === "down") totalDown += tx.amount;
-        });
+        if (t === "up") totalUp += tx.ratioAmount;
+        else if (t === "down") totalDown += tx.ratioAmount;
+    });
 
         console.log("Up total roufa:", totalUp.toFixed(2)); // formatted to 2 decimals
         console.log("Down total roufa:", totalDown.toFixed(2)); // formatted to 2 decimals
