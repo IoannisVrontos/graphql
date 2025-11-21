@@ -6,28 +6,57 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+
     <h1>Your Profile</h1>
-    <p id="userLogin">Loading...</p>
-    <p id="userFirstName"></p>
-    <p id="userLastName"></p>
-    <p id="userEmail"></p>
-    <p id="userLevel"></p>
-    <p id="userAudit"></p>
-    <p id="userExp"></p>
-    <p id="userUp"></p>
-    <p id="userDown"></p>
-    
 
-<button id="logoutBtn">Logout</button>
+     <!-- Background -->
+    <div id="background-container"></div>
 
-<!-- New graph container -->
-<h2>Audit Graph</h2>
-<div id="auditGraphContainer"></div>
 
-<h2>XP Graph</h2>
-<div id="xpGraphContainer"></div>
 
-    <script src="/scripts/profile.js"></script>
+ <div class="page-padding">
+
+
+    <section class="zoneBlock">
+    <!-- Sign -->
+    <img id="zoneSign" src="/static/img/zone01_sign.png" alt="Zone Sign">
+    </section>
+
+    <!-- BLOCK 1: Personal Info -->
+    <section class="personalInfoblock">
+        <h2>Personal Info</h2>
+        <p id="userLogin">Loading...</p>
+        <p id="userFirstName"></p>
+        <p id="userLastName"></p>
+        <p id="userEmail"></p>
+        <p id="userLevel"></p>
+        <p id="userExp"></p>
+        <button id="logoutBtn">Logout</button>
+    </section>
+
+    <!-- BLOCK 2: Audit Ratio -->
+    <section class="auditInfoblock">
+        <h2>Audit Ratio</h2>
+        <p id="userAudit"></p>
+        <p id="userUp"></p>
+        <p id="userDown"></p>
+    </section>
+
+    <!-- BLOCK 3: Audit Graph -->
+    <section class="auditGraphblock">
+        <h2>Audit Graph</h2>
+        <div id="auditGraphContainer"></div>
+    </section>
+
+    <!-- BLOCK 4: XP Graph -->
+    <section class="xpGraphblock">
+        <h2>XP Graph</h2>
+        <div id="xpGraphContainer"></div>
+    </section>
+
+    </div>
+    <script type="module" src="/scripts/profile.js"></script>
     <script src="/scripts/introspection.js"></script>
+
 </body>
 </html>

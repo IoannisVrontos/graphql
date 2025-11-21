@@ -1,3 +1,5 @@
+import { DrawXPGraphWithTooltip } from "./DrawGraphs.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("jwt");
     const userInfo = document.getElementById("userInfo");
@@ -82,7 +84,7 @@ userEmail.textContent= `Email: ${user.email}`;
 userAudit.textContent= `Audit Ratio: ${Math.round(user.auditRatio * 10) / 10}`;
 userLevel.textContent = `Current User Level: ${filteredTransactions.length+1}`;
 
-const CurrentExp = GetExp();
+GetExp();
 const sortedAudits = await loadAndCompare ();
 const {totalUp,totalDown} =await AuditNumbers(sortedAudits);
 
@@ -90,8 +92,6 @@ console.log(totalUp,totalDown)
 
 userUp.textContent = `Up Ratio: ${totalUp}`;
 userDown.textContent = `Down Ratio: ${totalDown}`;
-
-userExp.textContent = `Total Experience: ${CurrentExp}`;
 
 localStorage.setItem("loggedInUsername", user.login);
 
@@ -258,32 +258,9 @@ async function AuditsGraph() {
 }
 
 
-function FindMatches(userAudits, auditRatioData) {
-    
-    // create sets of dates for easy lookup
-    const auditDates = new Set(userAudits.map(a => normalizeDate(a.date)));
-    const ratioDates = new Set(auditRatioData.map(a => normalizeDate(a.date)));
-
-  // find items in userAudits that are NOT in auditRatioData
-    const auditsWithoutMatch = userAudits.filter(a => !ratioDates.has(normalizeDate(a.date)));
-
-    // find items in auditRatioData that are NOT in userAudits
-    const ratioWithoutMatch = auditRatioData.filter(a => !auditDates.has(normalizeDate(a.date)));
-    return {
-        auditsWithoutMatch,
-        ratioWithoutMatch
-    };
-
-}
-
-
-
 async function loadAndCompare() {
     await AuditRatioGraph();
     await AuditsGraph();
-
-    // now both arrays are populated
-    const result = FindMatches(userAudits, auditRatioData);
     
     const sortedAudits = MergeMatches(userAudits, auditRatioData);
     const { maxAudit: HighestAuditAttained, minAudit: LowestAuditAttained } = FindMaxAudit(sortedAudits);
@@ -348,7 +325,7 @@ function MergeMatches(userAudits, auditRatioData) {
             merged.push({
                 date: ratio.date,
                 auditType: "Cannot be recovered",
-                auditorLogin: ratio.type === "up" ? currentUsername : "Non-Believer",
+                auditorLogin: ratio.type === "up" ? currentUsername :currentUsername,
                 auditProject: ratio.project,
                 auditMembers: ratio.type === "down" ? currentUsername : "Non-Believer",
                 ratioType: ratio.type,
@@ -398,8 +375,7 @@ function FindMaxAudit (sortedAudits) {
     return { maxAudit, minAudit }; // ✅ return both as an object
 }
 
-
-function DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained,LowestAuditAttained, OldestDate) {
+export function DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained, LowestAuditAttained, OldestDate) {
     const padding = 60;
     const graphWidth = 800;
     const graphHeight = 700;
@@ -412,13 +388,17 @@ function DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained,LowestAudi
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("id", "auditGraphSvg");
-    svg.setAttribute("width", graphWidth + padding * 2);
-    svg.setAttribute("height", graphHeight + padding * 2);
-const container = document.getElementById("auditGraphContainer");
-container.innerHTML = ""; // clear previous graph
-container.appendChild(svg);
 
-    // Create tooltip div (hidden by default)
+    // ✅ Make SVG responsive
+    svg.setAttribute("viewBox", `0 0 ${graphWidth + padding * 2} ${graphHeight + padding * 2}`);
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "auto");
+
+    const container = document.getElementById("auditGraphContainer");
+    container.innerHTML = ""; // clear previous graph
+    container.appendChild(svg);
+
+    // Tooltip setup
     let tooltip = document.getElementById("auditTooltip");
     if (!tooltip) {
         tooltip = document.createElement("div");
@@ -433,31 +413,25 @@ container.appendChild(svg);
         document.body.appendChild(tooltip);
     }
 
-    // Convert dates to timestamps
+    // X-axis scaling
     const oldestTime = new Date(OldestDate).getTime();
     const newestTime = new Date(sortedAudits[sortedAudits.length - 1].date).getTime();
-
     const getX = date => {
         const t = new Date(date).getTime();
         const normalized = (t - oldestTime) / (newestTime - oldestTime);
         return padding + normalized * graphWidth;
     };
 
-    // ===== Y-axis min/max setup =====
-    // minY: starting ratio for bottom of graph
-    // maxY: top ratio for graph
+    // Y-axis scaling
     const ratios = sortedAudits.map(item => Number(item.currentRatio) || 0);
-    const minY = Math.min(...ratios,LowestAuditAttained-0.05); // change this if you want a different min
-    const maxY = Math.max(...ratios, HighestAuditAttained+0.05); // change this if needed
-    console.log("minY:", minY, "maxY:", maxY); // debug
-
+    const minY = Math.min(...ratios, LowestAuditAttained - 0.05);
+    const maxY = Math.max(...ratios, HighestAuditAttained + 0.05);
     const getY = ratio => {
-        const normalized = (ratio - minY) / (maxY - minY); // normalize to 0..1
-        return padding + graphHeight - normalized * graphHeight; // flip y-axis
+        const normalized = (ratio - minY) / (maxY - minY);
+        return padding + graphHeight - normalized * graphHeight;
     };
-    // ================================
 
-    // Draw axes
+    // Axes
     const xAxis = document.createElementNS(svgNS, "line");
     xAxis.setAttribute("x1", padding);
     xAxis.setAttribute("y1", padding + graphHeight);
@@ -490,7 +464,7 @@ container.appendChild(svg);
     yLabel.textContent = "Audit Ratio";
     svg.appendChild(yLabel);
 
-    // Draw polyline connecting points
+    // Polyline
     const polyline = document.createElementNS(svgNS, "polyline");
     polyline.setAttribute("fill", "none");
     polyline.setAttribute("stroke", "blue");
@@ -502,7 +476,7 @@ container.appendChild(svg);
     polyline.setAttribute("points", pointsArray.join(" "));
     svg.appendChild(polyline);
 
-    // Draw dots with tooltips
+    // Dots with tooltips
     sortedAudits.forEach(item => {
         const cx = getX(item.date);
         const cy = getY(Number(item.currentRatio) || 0);
@@ -514,7 +488,6 @@ container.appendChild(svg);
         circle.setAttribute("fill", "red");
         svg.appendChild(circle);
 
-        // Tooltip events
         circle.addEventListener("mouseenter", e => {
             tooltip.style.display = "block";
             const formattedDate = new Date(item.date).toLocaleDateString();
@@ -544,7 +517,7 @@ container.appendChild(svg);
         });
     });
 
-    console.log("SVG graph with tooltips drawn.");
+    console.log("✅ Audit Graph drawn.");
 }
 
 
@@ -665,141 +638,3 @@ async function GetExp() {
 
 // const xpData = await GetExp(); // from your earlier function
 
-
-function DrawXPGraphWithTooltip(xpData, totalXP) {
-    const padding = 60;
-    const graphWidth = 800;
-    const graphHeight = 700;
-
-    // 🧹 Remove old SVG if exists
-    const oldSvg = document.getElementById("xpGraphSvg");
-    if (oldSvg) oldSvg.remove();
-
-    // 🖼️ Create SVG
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("id", "xpGraphSvg");
-    svg.setAttribute("width", graphWidth + padding * 2);
-    svg.setAttribute("height", graphHeight + padding * 2);
-   const container = document.getElementById("xpGraphContainer");
-container.innerHTML = ""; // clear previous graph
-container.appendChild(svg);
-
-    // 💬 Tooltip setup
-    let tooltip = document.getElementById("xpTooltip");
-    if (!tooltip) {
-        tooltip = document.createElement("div");
-        tooltip.id = "xpTooltip";
-        tooltip.style.position = "absolute";
-        tooltip.style.padding = "8px";
-        tooltip.style.background = "rgba(0,0,0,0.8)";
-        tooltip.style.color = "white";
-        tooltip.style.borderRadius = "4px";
-        tooltip.style.pointerEvents = "none";
-        tooltip.style.display = "none";
-        document.body.appendChild(tooltip);
-    }
-
-    // 🕓 Define X-axis time range
-    const oldestDate = new Date(xpData[0].date);
-    const newestDate = new Date(); // today
-    const oldestTime = oldestDate.getTime();
-    const newestTime = newestDate.getTime();
-
-    // 🧭 Scale functions
-    const getX = date => {
-        const t = new Date(date).getTime();
-        const normalized = (t - oldestTime) / (newestTime - oldestTime);
-        return padding + normalized * graphWidth;
-    };
-
-    const getY = amount => {
-        return padding + graphHeight - (amount / totalXP) * graphHeight;
-    };
-
-    // 🧱 Draw axes
-    const xAxis = document.createElementNS(svgNS, "line");
-    xAxis.setAttribute("x1", padding);
-    xAxis.setAttribute("y1", padding + graphHeight);
-    xAxis.setAttribute("x2", padding + graphWidth);
-    xAxis.setAttribute("y2", padding + graphHeight);
-    xAxis.setAttribute("stroke", "black");
-    svg.appendChild(xAxis);
-
-    const yAxis = document.createElementNS(svgNS, "line");
-    yAxis.setAttribute("x1", padding);
-    yAxis.setAttribute("y1", padding);
-    yAxis.setAttribute("x2", padding);
-    yAxis.setAttribute("y2", padding + graphHeight);
-    yAxis.setAttribute("stroke", "black");
-    svg.appendChild(yAxis);
-
-    // 🏷️ Axis labels
-    const xLabel = document.createElementNS(svgNS, "text");
-    xLabel.setAttribute("x", padding + graphWidth / 2);
-    xLabel.setAttribute("y", padding + graphHeight + 40);
-    xLabel.setAttribute("text-anchor", "middle");
-    xLabel.textContent = "Time";
-    svg.appendChild(xLabel);
-
-    const yLabel = document.createElementNS(svgNS, "text");
-    yLabel.setAttribute("x", padding - 40);
-    yLabel.setAttribute("y", padding + graphHeight / 2);
-    yLabel.setAttribute("text-anchor", "middle");
-    yLabel.setAttribute("transform", `rotate(-90 ${padding - 40},${padding + graphHeight / 2})`);
-    yLabel.textContent = "XP Gained";
-    svg.appendChild(yLabel);
-
-    // 📈 Draw line connecting XP points
-    let cumulativeXP = 0;
-    const pointsArray = xpData.map(item => {
-        cumulativeXP += item.amount;
-        return `${getX(item.date)},${getY(cumulativeXP)}`;
-    });
-
-    const polyline = document.createElementNS(svgNS, "polyline");
-    polyline.setAttribute("fill", "none");
-    polyline.setAttribute("stroke", "green");
-    polyline.setAttribute("stroke-width", "2");
-    polyline.setAttribute("points", pointsArray.join(" "));
-    svg.appendChild(polyline);
-
-    // 🔴 Draw dots with tooltips
-    cumulativeXP = 0;
-    xpData.forEach(item => {
-        cumulativeXP += item.amount;
-        const cx = getX(item.date);
-        const cy = getY(cumulativeXP);
-
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", cx);
-        circle.setAttribute("cy", cy);
-        circle.setAttribute("r", 5);
-        circle.setAttribute("fill", "orange");
-        svg.appendChild(circle);
-
-        // Tooltip events
-        circle.addEventListener("mouseenter", e => {
-            tooltip.style.display = "block";
-            const formattedDate = new Date(item.date).toLocaleDateString();
-            tooltip.innerHTML = `
-                <strong>Date:</strong> ${formattedDate}<br>
-                <strong>Project:</strong> ${item.name || "N/A"}<br>
-                <strong>Type:</strong> ${item.type || "N/A"}<br>
-                <strong>XP Gained:</strong> ${item.amount}<br>
-                <strong>Total XP so far:</strong> ${Math.round(cumulativeXP)}
-            `;
-        });
-
-        circle.addEventListener("mousemove", e => {
-            tooltip.style.left = e.pageX + 10 + "px";
-            tooltip.style.top = e.pageY + 10 + "px";
-        });
-
-        circle.addEventListener("mouseleave", () => {
-            tooltip.style.display = "none";
-        });
-    });
-
-    console.log("✅ XP Graph drawn.");
-}
