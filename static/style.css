@@ -1,9 +1,25 @@
 /* Base body */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #fafafa;
-    padding: 20px 40px;  /* adjust as needed */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
+    color: #e0e0e0;
+    padding: 20px 40px;
+    position: relative;
+    overflow-x: hidden;
+}
 
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(90deg, transparent 0%, rgba(138, 43, 226, 0.1) 50%, transparent 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(138, 43, 226, 0.03) 2px, rgba(138, 43, 226, 0.03) 4px);
+    pointer-events: none;
+    z-index: 0;
 }
 
 html, body {
@@ -13,10 +29,11 @@ html, body {
 }
 
 .page-padding {
-    padding: 20px;          /* space from all edges */
-    position: relative;     /* allows manual block placement */
-    width: calc(100% - 40px);  /* compensate for padding */
+    padding: 20px;
+    position: relative;
+    width: calc(100% - 40px);
     height: calc(100% - 40px);
+    z-index: 1;
 }
 
 
@@ -27,10 +44,29 @@ html, body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: url('/static/img/graphQL_background.png') no-repeat;
-    background-size: cover; /* fills screen without distortion */
+    background: radial-gradient(ellipse at center, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
     z-index: -1;
     pointer-events: none;
+}
+
+#background-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(45deg, transparent 48%, rgba(138, 43, 226, 0.3) 49%, rgba(138, 43, 226, 0.3) 51%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(138, 43, 226, 0.3) 49%, rgba(138, 43, 226, 0.3) 51%, transparent 52%);
+    background-size: 100px 100px;
+    opacity: 0.05;
+    animation: grid-animation 20s linear infinite;
+}
+
+@keyframes grid-animation {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(100px, 100px); }
 }
 
 /* Master wrapper fixed & centered, keeps size */
@@ -42,14 +78,34 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px; /* space between sign and login */
+    gap: 40px;
+    z-index: 10;
 }
 
-/* Sign image */
-#zoneSign {
-    width: 411px;
-    height: 216px;
-    display: block;
+/* GraphQL Title */
+.graphql-title {
+    font-size: 5em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #bb86fc 0%, #8a2be2 50%, #6a0dad 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: 15px;
+    text-shadow: 0 0 30px rgba(138, 43, 226, 0.8);
+    filter: drop-shadow(0 0 40px rgba(138, 43, 226, 0.6));
+    animation: glow-pulse 3s ease-in-out infinite;
+    margin: 0;
+    padding: 20px 0;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 40px rgba(138, 43, 226, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 60px rgba(138, 43, 226, 0.9));
+    }
 }
 
 /* Login form container */
@@ -65,109 +121,510 @@ input.custom-input {
     height: 45px;
     font-size: 14px;
     line-height: 45px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
 
-    border: none;
+    border: 2px solid rgba(138, 43, 226, 0.5);
     outline: none;
+    border-radius: 8px;
 
-    background: url('/static/img/graphQL_textinput.png') no-repeat;
-    background-size: cover;
-    background-position: center;
+    background: rgba(20, 20, 40, 0.8);
+    backdrop-filter: blur(10px);
 
-    color: #333;
+    color: #e0e0e0;
     box-sizing: border-box;
     text-align: left;
+    transition: all 0.3s ease;
+}
+
+input.custom-input:focus {
+    border-color: #8a2be2;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.5), inset 0 0 10px rgba(138, 43, 226, 0.1);
+}
+
+input.custom-input::placeholder {
+    color: rgba(224, 224, 224, 0.5);
 }
 
 /* Custom login button */
 button.custom-button {
     width: 260px;
-    height: 80px;
-    background: url('/static/img/graphQL_login.png') no-repeat center center;
-    background-size: cover;
-    border: none;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.8) 0%, rgba(75, 0, 130, 0.8) 100%);
+    border: 2px solid #8a2be2;
+    border-radius: 30px;
     cursor: pointer;
     outline: none;
     display: block;
     margin: 20px auto;
     padding: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button.custom-button::before {
+    content: 'Login';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button.custom-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
 }
 
 button.custom-button:hover {
-    filter: brightness(1.1);
-    transform: scale(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.6), 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+button.custom-button:hover::after {
+    width: 300px;
+    height: 300px;
 }
 
 button.custom-button:active {
-    filter: brightness(0.9);
-    transform: scale(1.05);
+    transform: translateY(0);
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
 }
 
 /* Prevent autofill from changing background */
 input.custom-input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
-    -webkit-text-fill-color: #333 !important;
-    background: url('/static/img/graphQL_textinput.png') no-repeat !important;
-    background-size: cover !important;
-    background-position: center !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(20, 20, 40, 0.8) inset !important;
+    -webkit-text-fill-color: #e0e0e0 !important;
+    border: 2px solid rgba(138, 43, 226, 0.5) !important;
 }
 
 input.custom-input:-moz-autofill {
-    box-shadow: 0 0 0px 1000px transparent inset !important;
-    -moz-text-fill-color: #333 !important;
-    background: url('/static/img/graphQL_textinput.png') no-repeat !important;
-    background-size: cover !important;
-    background-position: center !important;
+    box-shadow: 0 0 0px 1000px rgba(20, 20, 40, 0.8) inset !important;
+    -moz-text-fill-color: #e0e0e0 !important;
+    border: 2px solid rgba(138, 43, 226, 0.5) !important;
 }
 
 .personalInfoblock,
 .auditInfoblock,
 .auditGraphblock,
 .xpGraphblock {
-    border: 1px solid #ccc;
-    padding: 20px;
+    border: 2px solid rgba(138, 43, 226, 0.4);
+    padding: 25px;
     margin: 20px 0;
-    border-radius: 10px;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    width: fit-content;   /* size just enough to fit content */
-    max-width: 95%;       /* prevent it from overflowing screen */
+    border-radius: 15px;
+    background: rgba(20, 20, 40, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(138, 43, 226, 0.2), inset 0 0 20px rgba(138, 43, 226, 0.05);
+    width: fit-content;
+    max-width: 95%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.personalInfoblock::before,
+.auditInfoblock::before,
+.auditGraphblock::before,
+.xpGraphblock::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, transparent, rgba(138, 43, 226, 0.3), transparent);
+    border-radius: 15px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.personalInfoblock:hover::before,
+.auditInfoblock:hover::before,
+.auditGraphblock:hover::before,
+.xpGraphblock:hover::before {
+    opacity: 1;
+}
+
+.personalInfoblock:hover,
+.auditInfoblock:hover,
+.auditGraphblock:hover,
+.xpGraphblock:hover {
+    border-color: rgba(138, 43, 226, 0.8);
+    box-shadow: 0 12px 40px rgba(138, 43, 226, 0.3), inset 0 0 30px rgba(138, 43, 226, 0.1);
+    transform: translateY(-2px);
+}
+
+.personalInfoblock h2,
+.auditInfoblock h2,
+.auditGraphblock h2,
+.xpGraphblock h2 {
+    color: #bb86fc;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid rgba(138, 43, 226, 0.5);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.personalInfoblock p,
+.auditInfoblock p,
+.auditGraphblock p,
+.xpGraphblock p {
+    color: #e0e0e0;
+    line-height: 1.8;
 }
 
 .auditGraphblock {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #ccc;
-
-    width: 600px;      /* desired width */
-    max-width: 95%;    /* responsive on small screens */
-    padding: 15px;     /* optional padding */
-    margin: 20px auto; /* center horizontally */
+    width: 600px;
+    max-width: 95%;
+    padding: 25px;
+    margin: 20px auto;
 }
 
 
 
 .xpGraphblock {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #ccc;
-
-    width: 600px;      /* desired width */
-    max-width: 95%;    /* responsive on small screens */
-    padding: 15px;     /* optional padding inside block */
-    margin: 20px auto; /* center horizontally */
+    width: 600px;
+    max-width: 95%;
+    padding: 25px;
+    margin: 20px auto;
 }
+
+/* Additional styling for h1 and buttons */
+h1 {
+    color: #bb86fc;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+#logoutBtn {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.6) 0%, rgba(75, 0, 130, 0.6) 100%);
+    border: 2px solid rgba(138, 43, 226, 0.6);
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+#logoutBtn:hover {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.8) 0%, rgba(75, 0, 130, 0.8) 100%);
+    border-color: #8a2be2;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+    transform: translateY(-2px);
+}
+
+#logoutBtn:active {
+    transform: translateY(0);
+}
+
+.zoneBlock {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#errorMsg {
+    color: #ff6b9d;
+    text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+    font-weight: bold;
+}
+
+/* Profile Page Specific Styles */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.profile-header .graphql-title {
+    font-size: 3.5em;
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.6) 0%, rgba(75, 0, 130, 0.6) 100%);
+    border: 2px solid rgba(138, 43, 226, 0.6);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.8) 0%, rgba(75, 0, 130, 0.8) 100%);
+    border-color: #8a2be2;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+    transform: translateY(-2px);
+}
+
+.logout-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.logout-btn:hover svg {
+    transform: translateX(3px);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.info-card {
+    background: rgba(20, 20, 40, 0.7);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(138, 43, 226, 0.3);
+    border-radius: 20px;
+    padding: 0;
+    overflow: visible;
+    transition: all 0.4s ease;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #8a2be2, transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.info-card:hover::before {
+    opacity: 1;
+}
+
+.info-card:hover {
+    border-color: rgba(138, 43, 226, 0.7);
+    box-shadow: 0 12px 48px rgba(138, 43, 226, 0.3);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(75, 0, 130, 0.1) 100%);
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.card-icon {
+    color: #bb86fc;
+    filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.5));
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    font-family: 'Orbitron', sans-serif;
+    color: #bb86fc;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    padding: 0;
+}
+
+.card-content {
+    padding: 30px;
+    position: relative;
+    overflow: visible;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border-left: 3px solid rgba(138, 43, 226, 0.4);
+    transition: all 0.3s ease;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.info-item:hover {
+    background: rgba(138, 43, 226, 0.1);
+    border-left-color: #8a2be2;
+    transform: translateX(5px);
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item.highlight {
+    background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(75, 0, 130, 0.05) 100%);
+    border-left: 3px solid #8a2be2;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+}
+
+.info-label {
+    font-weight: 600;
+    color: #bb86fc;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-weight: 700;
+    color: #e0e0e0;
+    font-size: 1.2em;
+    font-family: 'Rajdhani', sans-serif;
+    text-align: right;
+}
+
+.info-value.success {
+    color: #4ade80;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+.info-value.info {
+    color: #60a5fa;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+.graph-card {
+    grid-column: span 1;
+}
+
+.graph-card .card-content {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.graph-card {
+    background: rgba(20, 20, 40, 0.3);
+}
+
+.graph-card .card-header {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(75, 0, 130, 0.08) 100%);
+}
+
+#auditGraphContainer,
+#xpGraphContainer {
+    width: 100%;
+    min-height: 300px;
+    position: relative;
+    overflow: visible;
+    background: transparent;
+}
+
+/* Tooltip styling for graph data points */
+.info-card:hover {
+    z-index: 100;
+}
+
+.graph-card:hover {
+    z-index: 150;
+}
+
+/* Ensure SVG tooltips appear above everything */
+svg {
+    overflow: visible !important;
+}
+
+svg text,
+svg title,
+svg .tooltip,
+[role="tooltip"] {
+    position: relative;
+    z-index: 9999 !important;
+    pointer-events: auto;
+}
+
+/* Style for custom tooltips on graphs */
+.graph-tooltip,
+div[style*="position: absolute"] {
+    z-index: 10000 !important;
+    background: rgba(20, 20, 40, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(138, 43, 226, 0.8) !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    color: #e0e0e0 !important;
+    font-family: 'Rajdhani', sans-serif !important;
+    font-size: 14px !important;
+    box-shadow: 0 8px 32px rgba(138, 43, 226, 0.4) !important;
+    pointer-events: none !important;
+}
+
 /* Optional: responsive tweaks for small screens */
 @media (max-width: 600px) {
-    .zoneBlock,
-    .personalInfoblock,
-    .auditInfoblock,
-    .auditGraphblock,
-    .xpGraphblock {
-        width: 90%;
-        padding: 15px;
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .profile-header .graphql-title {
+        font-size: 2.5em;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .info-value {
+        text-align: center;
+    }
+}
+
+@media (min-width: 1200px) {
+    .graph-card {
+        grid-column: span 2;
     }
 }

@@ -2,59 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your Profile</title>
+    <title>Your Profile - GraphQL</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <h1>Your Profile</h1>
-
-     <!-- Background -->
+    <!-- Background -->
     <div id="background-container"></div>
 
+    <div class="page-padding">
+        
+        <!-- Header Section -->
+        <header class="profile-header">
+            <h1 class="graphql-title">GraphQL</h1>
+            <button id="logoutBtn" class="logout-btn">
+                <span>Logout</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </header>
 
+        <!-- Main Content Grid -->
+        <div class="profile-grid">
+            
+            <!-- Personal Info Card -->
+            <section class="info-card personal-card">
+                <div class="card-header">
+                    <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <h2>Personal Information</h2>
+                </div>
+                <div class="card-content">
+                    <div class="info-item">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value" id="userLogin">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">First Name:</span>
+                        <span class="info-value" id="userFirstName">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Name:</span>
+                        <span class="info-value" id="userLastName">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="userEmail">—</span>
+                    </div>
+                    <div class="info-item highlight">
+                        <span class="info-label">Level:</span>
+                        <span class="info-value" id="userLevel">—</span>
+                    </div>
+                    <div class="info-item highlight">
+                        <span class="info-label">Total XP:</span>
+                        <span class="info-value" id="userExp">—</span>
+                    </div>
+                </div>
+            </section>
 
- <div class="page-padding">
+            <!-- Audit Ratio Card -->
+            <section class="info-card audit-card">
+                <div class="card-header">
+                    <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <h2>Audit Statistics</h2>
+                </div>
+                <div class="card-content">
+                    <div class="info-item highlight">
+                        <span class="info-label">Audit Ratio:</span>
+                        <span class="info-value" id="userAudit">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Given:</span>
+                        <span class="info-value success" id="userUp">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Received:</span>
+                        <span class="info-value info" id="userDown">—</span>
+                    </div>
+                </div>
+            </section>
 
+            <!-- Audit Graph Card -->
+            <section class="info-card graph-card">
+                <div class="card-header">
+                    <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    <h2>Audit Progress</h2>
+                </div>
+                <div class="card-content">
+                    <div id="auditGraphContainer"></div>
+                </div>
+            </section>
 
-    <section class="zoneBlock">
-    <!-- Sign -->
-    <img id="zoneSign" src="/static/img/zone01_sign.png" alt="Zone Sign">
-    </section>
+            <!-- XP Graph Card -->
+            <section class="info-card graph-card">
+                <div class="card-header">
+                    <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    <h2>XP Progression</h2>
+                </div>
+                <div class="card-content">
+                    <div id="xpGraphContainer"></div>
+                </div>
+            </section>
 
-    <!-- BLOCK 1: Personal Info -->
-    <section class="personalInfoblock">
-        <h2>Personal Info</h2>
-        <p id="userLogin">Loading...</p>
-        <p id="userFirstName"></p>
-        <p id="userLastName"></p>
-        <p id="userEmail"></p>
-        <p id="userLevel"></p>
-        <p id="userExp"></p>
-        <button id="logoutBtn">Logout</button>
-    </section>
-
-    <!-- BLOCK 2: Audit Ratio -->
-    <section class="auditInfoblock">
-        <h2>Audit Ratio</h2>
-        <p id="userAudit"></p>
-        <p id="userUp"></p>
-        <p id="userDown"></p>
-    </section>
-
-    <!-- BLOCK 3: Audit Graph -->
-    <section class="auditGraphblock">
-        <h2>Audit Graph</h2>
-        <div id="auditGraphContainer"></div>
-    </section>
-
-    <!-- BLOCK 4: XP Graph -->
-    <section class="xpGraphblock">
-        <h2>XP Graph</h2>
-        <div id="xpGraphContainer"></div>
-    </section>
-
+        </div>
     </div>
+
     <script type="module" src="/scripts/profile.js"></script>
     <script src="/scripts/introspection.js"></script>
 

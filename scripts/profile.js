@@ -523,6 +523,19 @@ export function DrawAuditGraphWithTooltip(sortedAudits, HighestAuditAttained, Lo
 
 function AuditNumbers(sortedAudits) {
    
+console.log(sortedAudits)
+
+
+    sortedAudits.forEach(tx => {
+        const h = tx.ratioType;  
+        if (h=="down") {
+            console.log(tx.auditProject)
+            console.log(tx.auditType)
+            console.log(tx.ratioAmount)
+            console.log(tx.auditType0)
+        }
+     } // <-- use ratioType
+    );
     console.log("sortedAudits received:", sortedAudits);
         // Calculate total based on type
         let totalUp = 0;
@@ -531,7 +544,11 @@ function AuditNumbers(sortedAudits) {
         const t = tx.ratioType;   // <-- use ratioType
 
         if (t === "up") totalUp += tx.ratioAmount;
-        else if (t === "down") totalDown += tx.ratioAmount;
+        else if (t === "down") {
+            if (tx.auditType !== "Cannot be recovered"){
+            totalDown += tx.ratioAmount;
+        }
+        }
     });
 
         console.log("Up total roufa:", totalUp.toFixed(2)); // formatted to 2 decimals
