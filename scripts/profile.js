@@ -545,7 +545,7 @@ console.log(sortedAudits)
 
         if (t === "up") totalUp += tx.ratioAmount;
         else if (t === "down") {
-            if (tx.auditType !== "Cannot be recovered"){
+            if ((tx.auditType !== "Cannot be recovered") || (tx.auditType === "Cannot be recovered" && tx.auditorLogin === tx.auditMembers)){
             totalDown += tx.ratioAmount;
         }
         }
