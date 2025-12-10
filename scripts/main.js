@@ -25,6 +25,3 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         errorMsg.textContent = "Network error. Please try again.";
     }
 });
-
-
-// BuildWallBackground();

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"graphQL/handlers"
-	"graphQL/proxy"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"graphQL/handlers"
+	"graphQL/proxy"
 )
 
 func main() {
