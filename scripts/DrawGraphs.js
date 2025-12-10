@@ -41,8 +41,12 @@ export function DrawXPGraphWithTooltip(xpData, totalXP) {
     const oldestTime = oldestDate.getTime();
     const newestTime = newestDate.getTime();
 
+    // console.log("aaaaaa", oldestTime)
+    // console.log("ooooooooooo", new Date(date).getTime())
+
     const getX = date => {
         const t = new Date(date).getTime();
+        console.log("koita edw", t)
         const normalized = (t - oldestTime) / (newestTime - oldestTime);
         return padding + normalized * graphWidth;
     };
@@ -119,7 +123,7 @@ export function DrawXPGraphWithTooltip(xpData, totalXP) {
                 <strong>Project:</strong> ${item.name || "N/A"}<br>
                 <strong>Type:</strong> ${item.type || "N/A"}<br>
                 <strong>XP Gained:</strong> ${item.amount}<br>
-                <strong>Total XP so far:</strong> ${Math.round(cumulativeXP)}
+                <strong>Total XP so far:</strong> ${item.cumXP}
             `;
         });
 

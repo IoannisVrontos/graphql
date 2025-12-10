@@ -64,8 +64,9 @@ const query = `
         const user = data.data.user[0];
         localStorage.setItem("userId", user.id);
         
-        // console.log(data)
+        console.log(data)
         // console.log(user)
+        
         
     // getting final level of dude by filtering out piscine level ups
     const transactions = data.data.user[0].transactions;
@@ -76,13 +77,15 @@ const query = `
         return secondToLast === "div-01";
     });
 
+    console.log(filteredTransactions)
+
 // console.log(filteredTransactions);
 userLogin.textContent = `Platform Username: ${user.login}`;
 userFirstName.textContent = `First Name: ${user.firstName}`;
 userLastName.textContent=`Last Name: ${user.lastName}`;
 userEmail.textContent= `Email: ${user.email}`;
 userAudit.textContent= `Audit Ratio: ${Math.round(user.auditRatio * 10) / 10}`;
-userLevel.textContent = `Current User Level: ${filteredTransactions.length+1}`;
+userLevel.textContent = `Current User Level: ${filteredTransactions[filteredTransactions.length-1].amount}`;
 
 GetExp();
 const sortedAudits = await loadAndCompare ();
@@ -528,12 +531,12 @@ console.log(sortedAudits)
 
     sortedAudits.forEach(tx => {
         const h = tx.ratioType;  
-        if (h=="down") {
-            console.log(tx.auditProject)
-            console.log(tx.auditType)
-            console.log(tx.ratioAmount)
-            console.log(tx.auditType0)
-        }
+        // if (h=="down") {
+        //     console.log(tx.auditProject)
+        //     console.log(tx.auditType)
+        //     console.log(tx.ratioAmount)
+        //     console.log(tx.auditType0)
+        // }
      } // <-- use ratioType
     );
     console.log("sortedAudits received:", sortedAudits);
@@ -631,8 +634,14 @@ async function GetExp() {
             date: tx.createdAt,                     // ISO timestamp
             type: tx.object?.type || "unknown",     // object type
             name: tx.object?.name || "unknown",     // project/exercise/piscine name
+            cumXP : 0,
         }));
 
+        let tempXP = 0;
+        xpData.forEach(tx => {
+            tempXP = tempXP + tx.amount
+            tx.cumXP = tempXP
+        })
         console.log("XP Data:", xpData);
 
         // You can also compute total XP if you want
@@ -640,6 +649,7 @@ async function GetExp() {
         console.log("Total XP:", xpSum);
 
         const totalXP = xpData.reduce((sum, tx) => sum + tx.amount, 0);
+        xpData.sort((a, b) => new Date(a.date) - new Date(b.date));
         DrawXPGraphWithTooltip(xpData, totalXP);
 
         userExp.textContent = `Total Experience: ${totalXP}`;
