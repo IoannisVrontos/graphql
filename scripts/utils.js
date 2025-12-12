@@ -12,7 +12,7 @@ export function FormatSize(numStr) {
     }
 
     // Round UP to nearest integer
-    const rounded = Math.ceil(size);
+    const rounded = Math.round(size);
 
     return `${rounded}${units[index]}`;
 }
@@ -24,38 +24,38 @@ export function normalizeDate(dateString) {
     const day = String(d.getUTCDate()).padStart(2, "0");
     const hours = String(d.getUTCHours()).padStart(2, "0");
     const minutes = String(d.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(d.getUTCSeconds()).padStart(2,"0");
+    const seconds = String(d.getUTCSeconds()).padStart(2, "0");
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
 
 export function AuditNumbers(sortedAudits) {
-   
-        // Calculate total based on type
-        let totalUp = 0;
-        let totalDown = 0;
-         sortedAudits.forEach(tx => {
+
+    // Calculate total based on type
+    let totalUp = 0;
+    let totalDown = 0;
+    sortedAudits.forEach(tx => {
         const t = tx.ratioType;   // <-- use ratioType
 
         if (t === "up") totalUp += tx.ratioAmount;
         else if (t === "down") {
-            if ((tx.auditType !== "Cannot be recovered") || (tx.auditType === "Cannot be recovered" && tx.auditorLogin === tx.auditMembers)){
-            totalDown += tx.ratioAmount;
-        }
+            if ((tx.auditType !== "Cannot be recovered") || (tx.auditType === "Cannot be recovered" && tx.auditorLogin === tx.auditMembers)) {
+                totalDown += tx.ratioAmount;
+            }
         }
     });
-        
-        return {totalUp, totalDown}
+
+    return { totalUp, totalDown }
 }
 
-export function FindMaxAudit (sortedAudits) {
+export function FindMaxAudit(sortedAudits) {
     let startingUp = 100000;
     let startingDown = 100000;
     let maxAudit = 0;
     let minAudit = 5;
 
 
-        sortedAudits.forEach(item => {
+    sortedAudits.forEach(item => {
         if (item.ratioType === "up") {
             startingUp += item.ratioAmount;
         } else if (item.ratioType === "down") {
@@ -63,20 +63,20 @@ export function FindMaxAudit (sortedAudits) {
         }
 
 
-         const currentRatio = startingUp / startingDown;
+        const currentRatio = startingUp / startingDown;
 
         // store current ratio inside the item
         item.currentRatio = Number(currentRatio.toFixed(2));
 
-        if (minAudit > startingUp/startingDown) {
-            minAudit = startingUp/startingDown
+        if (minAudit > startingUp / startingDown) {
+            minAudit = startingUp / startingDown
         }
 
-        if (maxAudit < startingUp/startingDown) {
-            maxAudit = startingUp/startingDown
-        } 
+        if (maxAudit < startingUp / startingDown) {
+            maxAudit = startingUp / startingDown
+        }
     });
-    
+
     return { maxAudit, minAudit }; // ✅ return both as an object
 }
 
@@ -117,7 +117,7 @@ export function MergeMatches(userAudits, auditRatioData) {
             merged.push({
                 date: ratio.date,
                 auditType: "Cannot be recovered",
-                auditorLogin: ratio.type === "up" ? currentUsername :currentUsername,
+                auditorLogin: ratio.type === "up" ? currentUsername : currentUsername,
                 auditProject: ratio.project,
                 auditMembers: ratio.type === "down" ? currentUsername : "Non-Believer",
                 ratioType: ratio.type,
