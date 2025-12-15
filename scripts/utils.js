@@ -2,7 +2,7 @@ export function FormatSize(numStr) {
     const num = typeof numStr === "number" ? numStr : parseFloat(numStr);
     if (isNaN(num)) return null;
 
-    const units = ["", "kb", "mb", "gb", "tb", "pb"];
+    const units = ["", "KB", "MB", "GB", "TB", "PB"];
     let size = num;
     let index = 0;
 
@@ -12,9 +12,9 @@ export function FormatSize(numStr) {
     }
 
     // Round UP to nearest integer
-    const rounded = Math.round(size);
-
-    return `${rounded}${units[index]}`;
+    // const rounded = Math.ceil(size);
+    
+    return `${size.toFixed(2)} ${units[index]}`;
 }
 
 export function normalizeDate(dateString) {
