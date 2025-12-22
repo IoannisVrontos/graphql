@@ -12,8 +12,8 @@ import (
 
 func main() {
 	// Serve static files
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static"))))
-	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("../scripts"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("scripts"))))
 
 	// Routes
 	http.HandleFunc("/", serveTemplate("index.html"))
