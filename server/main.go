@@ -30,7 +30,7 @@ func main() {
 // Helper to serve templates with error handling
 func serveTemplate(filename string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tmplPath := filepath.Join("../templates", filename)
+		tmplPath := filepath.Join("templates", filename)
 		tmpl, err := template.ParseFiles(tmplPath)
 		if err != nil {
 			http.Error(w, "Failed to load template", http.StatusInternalServerError)
